@@ -1,0 +1,48 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
+// https://github.com/microsoft/vscode-dev-containers/tree/v0.224.2/containers/kubernetes-helm
+{
+	"name": "Tekton Container Environment",
+	"build": {
+		"dockerfile": "Dockerfile",
+		"context": ".."
+	},
+
+    // Bind things that are needed by tooling within the container
+	"mounts": [
+		"source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind",
+		"source=${env:HOME}${env:USERPROFILE}/.kube,target=/root/.kube,type=bind",
+		"source=${env:HOME}${env:USERPROFILE}/.ssh,target=/root/.ssh,type=bind",
+		"source=${env:HOME}${env:USERPROFILE}/.gitconfig,target=/root/.gitconfig,type=bind"
+	],
+
+	// Set bash as the command
+    "settings": {
+        "terminal.integrated.profiles.linux": {
+          "bash": {
+            "path": "/bin/bash"
+          }
+        },
+        "terminal.integrated.defaultProfile.linux": "bash"
+      },
+
+	// Add the IDs of extensions you want installed when the container is created.
+	"extensions": [
+		"ms-azuretools.vscode-docker",
+		"ms-kubernetes-tools.vscode-kubernetes-tools",
+		"shakram02.bash-beautify",
+		"tim-koehler.helm-intellisense",
+		"inercia.vscode-k3d",
+        "davidanson.vscode-markdownlint",
+		"eamodio.gitlens",
+		"editorconfig.editorconfig",
+		"streetsidesoftware.code-spell-checker",
+        "yzhang.markdown-all-in-one",
+		"ms-vsliveshare.vsliveshare-pack",
+		"ms-vsliveshare.vsliveshare-audio",
+		"ms-vsliveshare.vsliveshare-pack"
+	],
+
+	// load other persistent / sensitive info via the ENV
+	"runArgs": ["--env-file", ".env"],
+    "initializeCommand": "echo >>.env"
+}
