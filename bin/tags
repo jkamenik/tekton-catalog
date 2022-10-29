@@ -1,0 +1,56 @@
+#!/bin/bash
+
+APP_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
+cd "$APP_DIR"
+
+# log debug to stdout
+function log() {
+  # shellcheck disable=SC2145
+  echo "$@" >&2
+}
+function fatal() {
+    log "$@"
+    exit 1
+}
+
+dir="$1"
+dockerfile="$dir/Dockerfile"
+
+if [[ -z "$dir" ]]; then
+  fatal "A directory is required"
+fi
+
+repo=$(echo "$dir" | cut -sd "/" -f 2)
+tag=$(echo "$dir" | cut -sd "/" -f 3)
+revision=$(TZ="UTC" date +"%Y%m%d%H%M%S")
+
+if [ -z "$repo" ] || [ -z "$tag" ]; then
+  fatal "Invalid directory pattern (containers/<task name>/<version>): $dir"
+fi
+
+if ! [ -d "$dir" ]; then
+  fatal "Invalid directory: $dir"
+fi
+
+if ! [ -f "$dockerfile" ]; then
+  fatal "No Dockerfile in directory: $dockerfile"
+fi
+
+# Pull useful labels
+prefix=$(grep "LABEL Repo" "$dockerfile" | head -n 1 | cut -d '"' -f 2)
+retag=$(grep "LABEL Tag" "$dockerfile" | head -n 1 | cut -d '"' -f 2)
+
+default_tag="${prefix}${repo}:${tag}-${revision}"
+
+log "Repo Prefix: '$prefix'"
+log "Repo:        '$repo'"
+log "Default Tag: '$tag'"
+log "Revision:    '$revision'"
+log "Full:        '$default_tag'"
+log "ReTag:       '$retag'"
+
+echo "$default_tag"
+
+if [[ -n "$retag" ]]; then
+    echo "$retag"
+fi
