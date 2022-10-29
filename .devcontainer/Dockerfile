@@ -16,4 +16,5 @@ RUN go install -v golang.org/x/tools/gopls@latest \
 RUN apk add --no-cache \
     bash \
     git \
+    git-lfs \
     openssh
