@@ -1,0 +1,25 @@
+#!/bin/bash
+
+APP_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
+cd "$APP_DIR"
+
+if ! bin/tags "$@" > .version ; then
+  exit 1
+fi
+
+# bail on first error
+set -e
+
+echo "==== Versions ===="
+cat .version
+
+echo "==== Building ===="
+cd "$@"
+tmp_tag="tkn-catalog-build"
+docker build --label "commit=$commit" -t "$tmp_tag" .
+
+echo "==== Tagging ===="
+while IFS= read -r tag; do
+    echo "$tag"
+    docker tag "$tmp_tag" "$tag"
+done < <(cat "$APP_DIR/.version")

@@ -16,3 +16,6 @@
 
 # Ignore Sensitive info
 .env
+
+# Ignore build artifacts
+.version
